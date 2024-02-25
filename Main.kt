@@ -10,18 +10,12 @@ fun menu() {
     println("2. Total Harga")
     println("3. Gaji Karyawan")
     print("Pilih Menu: ")
-    val menu = readln().toInt()
+    val input = readln().toInt()
 
-    when (menu) {
+    when (input) {
         1 -> {
-            print("Username: ")
-            val username = readln()
-
-            print("Password: ")
-            val password = readln()
-
-            if (login(username, password)) println("Login Berhasil")
-            else exceptionHandler()
+            if (login()) println("Login Berhasil")
+            else exceptionHandler("Login Gagal")
         }
         2 -> totalHarga()
         3 -> gajiKaryawan()
@@ -29,21 +23,29 @@ fun menu() {
     }
 }
 
-fun login(username: String, password: String): Boolean {
+fun login(): Boolean {
+    print("Username: ")
+    val username = readln()
+
+    print("Password: ")
+    val password = readln()
+
     return validateUsername(username) && validatePassword(password)
 }
 
 fun validateUsername(username: String): Boolean {
+    // tujuan pake flag dan ga pake return 1 1, biar semua error bisa ditampilkan
     var flag = 1
     if (username.isEmpty()) {
         println("Username cannot be empty")
         flag = 0
     } else {
+        // requirement dari soal
         if ((username.length < 6) || (username.length > 15)) {
             println("Username must be at least 6 characters long and at most 15 characters long")
             flag = 0
         } else {
-            if (username.onlyLetters() || username.onlyNumbers()) {
+            if (!username.containsLetterAndDigit()) {
                 println("Username must contain letters and numbers")
                 flag = 0
             }
@@ -58,11 +60,12 @@ fun validatePassword(password: String): Boolean {
         println("Password cannot be empty")
         flag = 0
     } else {
+        // requirement dari soal
         if ((password.length < 8) || (password.length > 20)) {
             println("Password must be at least 8 characters long and at most 20 characters long")
             flag = 0
         } else {
-            if (password.onlyLetters() || password.onlyNumbers() || password.onlySpecialCharacters()) {
+            if (password.onlyLetterAndDigit()) {
                 println("Password must contain letters, numbers, and special characters")
                 flag = 0
             }
@@ -71,20 +74,18 @@ fun validatePassword(password: String): Boolean {
     return flag == 1
 }
 
-fun String.onlyLetters(): Boolean {
-    return this.all { it.isLetter() }
+fun String.containsLetterAndDigit(): Boolean {
+    // return true kalau ada at least 1 huruf dan 1 angka
+    return this.any { it.isLetter() } && this.any { it.isDigit() }
 }
 
-fun String.onlyNumbers(): Boolean {
-    return this.all { it.isDigit() }
-}
-
-fun String.onlySpecialCharacters(): Boolean {
+fun String.onlyLetterAndDigit(): Boolean {
+    // return true kalau semua karakter adalah huruf atau angka
     return this.all { it.isLetterOrDigit() }
 }
 
-fun exceptionHandler() {
-    throw Exception("Login Gagal")
+fun exceptionHandler(msg: String) {
+    throw Exception(msg)
 }
 
 fun totalHarga() {
@@ -95,37 +96,51 @@ fun totalHarga() {
     println("Stok Produk: ${stokProduk}pcs")
 
     val hargaProduk = 5000
-    println("Harga Produk: Rp ${convertToRupiah(hargaProduk)}\n")
+    println("Harga Produk: Rp ${hargaProduk}\n")
 
-    val (quantityProduk, nominalBayar) = getInput()
+    val (quantityProduk, nominalBayar) = getQuantityAndNominal()
 
     println("\n=====================================")
 
-    if (quantityProduk > stokProduk) print("Stok yang Anda beli kurang dari ${quantityProduk}pcs")
+    if (quantityProduk > stokProduk) exceptionHandler("Stok yang Anda beli kurang dari ${quantityProduk}pcs")
     else transaction(quantityProduk, nominalBayar, hargaProduk)
+}
+
+fun getQuantityAndNominal(): Pair<Int, Int> {
+    print("Quantity Pembelian: ")
+    val quantityProduk = validateQuantityAndNominal(readln(), "Quantity Pembelian")
+
+    print("Masukkan Nominal : ")
+    val nominalBayar = validateQuantityAndNominal(readln(), "Nominal Pembayaran")
+
+    return Pair(quantityProduk, nominalBayar)
+}
+
+fun validateQuantityAndNominal(input: String, msg: String): Int {
+    var finalInput = 0
+
+    if (input.isEmpty()) exceptionHandler("$msg tidak boleh kosong")
+    else {
+        if (input.contains("-")) exceptionHandler("$msg tidak boleh negatif")
+        else {
+            finalInput = input.filter { it.isDigit() }.toInt()
+
+            if (finalInput == 0) exceptionHandler("$msg tidak boleh 0")
+        }
+    }
+
+    return finalInput
 }
 
 fun transaction(quantityProduk: Int, nominalBayar: Int, hargaProduk: Int) {
     val totalHarga = quantityProduk * hargaProduk
-    println("Total Harga Produk: Rp ${convertToRupiah(totalHarga)}")
+    println("Total Harga Produk: Rp $totalHarga")
 
     val totalBayar = validateDiskon(totalHarga)
-    println("Total yang harus Anda bayar sebesar Rp ${convertToRupiah(totalBayar)}")
+    println("Total yang harus Anda bayar sebesar Rp $totalBayar")
 
-    println("Uang pembayaran Anda sebesar Rp ${convertToRupiah(nominalBayar)}")
+    println("Uang pembayaran Anda sebesar Rp $nominalBayar")
     validatePembayaran(nominalBayar, totalBayar)
-}
-
-fun getInput(): Pair<Int, Int> {
-    print("Quantity Pembelian: ")
-    val getInputQuantity = readln()
-    val quantityProduk = validateInput(getInputQuantity, "Quantity")
-
-    print("Masukkan Nominal : ")
-    val getNominalBayar = readln()
-    val nominalBayar = validateInput(getNominalBayar, "Nominal Pembayaran")
-
-    return Pair(quantityProduk, nominalBayar)
 }
 
 fun validateDiskon(totalHarga: Int): Int {
@@ -140,50 +155,17 @@ fun validateDiskon(totalHarga: Int): Int {
     var potonganHarga = 0.0
     if (diskon != 0.0) {
         potonganHarga = totalHarga * diskon
-        println("Anda mendapat diskon sebesar Rp ${convertToRupiah(potonganHarga.toInt())}")
+        println("Anda mendapat diskon sebesar Rp ${potonganHarga.toInt()}")
     }
 
     return (totalHarga - potonganHarga).toInt()
 }
 
-fun convertToRupiah(value: Int): String {
-    val valueString = value.toString()
-    val valueLength = valueString.length
-
-    val rupiah = StringBuilder()
-    var counter = 0
-
-    for (i in valueLength - 1 downTo 0) {
-        rupiah.append(valueString[i])
-        counter++
-
-        if (counter == 3 && i != 0) {
-            rupiah.append(".")
-            counter = 0
-        }
-    }
-
-    return rupiah.reverse().toString()
-}
-
-fun validateInput(input: String, msg: String): Int {
-    if (input.isEmpty()) println("$msg tidak boleh kosong")
+fun validatePembayaran(nominalBayar: Int, totalBayar: Int) {
+    if (nominalBayar < totalBayar) exceptionHandler("Uang yang Anda bayarkan kurang, harap ubah nominal pembayaran")
     else {
-        if (input.contains("-")) println("$msg tidak boleh negatif")
-    }
-
-    val finalInput = input.filter { it.isDigit() }.toInt()
-
-    if (finalInput == 0) println("$msg tidak boleh 0")
-
-    return finalInput
-}
-
-fun validatePembayaran(totalBayar: Int, totalHarga: Int) {
-    if (totalBayar < totalHarga) println("Uang yang Anda bayarkan kurang, harap ubah nominal pembayaran")
-    else {
-        if (totalBayar % 100000 != 0) println("Uang yang Anda bayarkan bukan kelipatan Rp 100.000, harap ubah nominal pembayaran")
-        else println("Uang kembalian Anda sebesar Rp ${convertToRupiah(totalBayar - totalHarga)}")
+        if (nominalBayar % 100000 != 0) exceptionHandler("Uang yang Anda bayarkan bukan kelipatan Rp 100.000, harap ubah nominal pembayaran")
+        else println("Uang kembalian Anda sebesar Rp ${nominalBayar - totalBayar}")
     }
 }
 
@@ -199,28 +181,22 @@ fun gajiKaryawan() {
 
     println("Total Gaji")
     println("=====================================")
-    if (validateInputGaji(namaKaryawan, grade)) calculateGaji(namaKaryawan, grade, jumlahJamKerja)
+    validateInputGaji(namaKaryawan, grade, jumlahJamKerja)
 }
 
-fun validateInputGaji(namaKaryawan: String, grade: String): Boolean {
-    var flag = 1
-    if (namaKaryawan.isEmpty()) {
-        println("Nama Karyawan tidak boleh kosong")
-        flag = 0
-    }
-
-    if (grade.isEmpty()) {
-        println("Grade tidak boleh kosong")
-        flag = 0
-    }
+fun validateInputGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int) {
+    if (namaKaryawan.isEmpty()) exceptionHandler("Nama Karyawan tidak boleh kosong")
 
     val validateGrade = "ABCD"
-    if (!validateGrade.contains(grade)) {
-        println("Grade tidak valid")
-        flag = 0
+    if (grade.isEmpty()) exceptionHandler("Grade tidak boleh kosong")
+    else {
+        if (grade.length > 1) exceptionHandler("Grade tidak valid")
+        else {
+            if (!validateGrade.contains(grade)) exceptionHandler("Grade tidak valid")
+        }
     }
 
-    return flag == 1
+    calculateGaji(namaKaryawan, grade, jumlahJamKerja)
 }
 
 fun calculateGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int){
@@ -251,25 +227,25 @@ fun calculateGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int){
     }
 
     val jamKerjaPerMinggu = 40
-    var gajiTotal = 0.0
+    val gajiTotal: Double
 
     if (jumlahJamKerja > jamKerjaPerMinggu) {
         val lembur = jumlahJamKerja - jamKerjaPerMinggu
         val gajiLembur = lembur * gajiPerJamLembur
         gajiTotal = (gajiPerJam * jamKerjaPerMinggu) + gajiLembur
 
-        println("Gaji Anda minggu ini sebesar Rp ${convertToRupiah(gajiTotal.toInt())}")
+        println("Gaji Anda minggu ini sebesar Rp ${gajiTotal.toInt()}")
         println("Anda melakukan lembur sebanyak $lembur jam")
-        println("Upah lembur Anda sebesar Rp ${convertToRupiah(gajiLembur.toInt())}")
+        println("Upah lembur Anda sebesar Rp ${gajiLembur.toInt()}")
     } else if (jumlahJamKerja < jamKerjaPerMinggu) {
-        val potonganGaji = (jamKerjaPerMinggu - jumlahJamKerja) * gajiPerJam * potonganPerJam
+        val potonganGaji = (jamKerjaPerMinggu - jumlahJamKerja) * (gajiPerJam * potonganPerJam)
         gajiTotal = (gajiPerJam * jamKerjaPerMinggu) - potonganGaji
 
         println("Total jam kerja Anda minggu ini kurang dari 40 jam")
-        println("Anda dipotong gaji sebesar Rp ${convertToRupiah(potonganGaji.toInt())}")
+        println("Anda dipotong gaji sebesar Rp ${potonganGaji.toInt()}")
     } else {
         gajiTotal = gajiPerJam * jamKerjaPerMinggu
     }
 
-    println("Total Gaji yang Anda dapatkan minggu ini sebesar Rp ${convertToRupiah(gajiTotal.toInt())}")
+    println("Total Gaji yang Anda dapatkan minggu ini sebesar Rp ${gajiTotal.toInt()}")
 }
