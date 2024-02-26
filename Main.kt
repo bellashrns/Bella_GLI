@@ -34,44 +34,27 @@ fun login(): Boolean {
 }
 
 fun validateUsername(username: String): Boolean {
-    // tujuan pake flag dan ga pake return 1 1, biar semua error bisa ditampilkan
-    var flag = 1
-    if (username.isEmpty()) {
-        println("Username cannot be empty")
-        flag = 0
-    } else {
+    if (username.isEmpty()) exceptionHandler("Username cannot be empty")
+    else {
         // requirement dari soal
-        if ((username.length < 6) || (username.length > 15)) {
-            println("Username must be at least 6 characters long and at most 15 characters long")
-            flag = 0
-        } else {
-            if (!username.containsLetterAndDigit()) {
-                println("Username must contain letters and numbers")
-                flag = 0
-            }
+        if ((username.length < 6) || (username.length > 15)) exceptionHandler("Username must be at least 6 characters long and at most 15 characters long")
+        else {
+            if (!username.containsLetterAndDigit()) exceptionHandler("Username must contain letters and numbers")
         }
     }
-    return flag == 1
+    return true
 }
 
 fun validatePassword(password: String): Boolean {
-    var flag = 1
-    if (password.isEmpty()) {
-        println("Password cannot be empty")
-        flag = 0
-    } else {
+    if (password.isEmpty()) exceptionHandler("Password cannot be empty")
+    else {
         // requirement dari soal
-        if ((password.length < 8) || (password.length > 20)) {
-            println("Password must be at least 8 characters long and at most 20 characters long")
-            flag = 0
-        } else {
-            if (password.onlyLetterAndDigit()) {
-                println("Password must contain letters, numbers, and special characters")
-                flag = 0
-            }
+        if ((password.length < 8) || (password.length > 20)) exceptionHandler("Password must be at least 8 characters long and at most 20 characters long")
+        else {
+            if (password.onlyLetterAndDigit() || !password.containsLetterAndDigit()) exceptionHandler("Password must contain letters, numbers, and special characters")
         }
     }
-    return flag == 1
+    return true
 }
 
 fun String.containsLetterAndDigit(): Boolean {
