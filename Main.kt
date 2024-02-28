@@ -13,10 +13,7 @@ fun menu() {
     val input = readln().toInt()
 
     when (input) {
-        1 -> {
-            if (login()) println("Login Berhasil")
-            else exceptionHandler("Login Gagal")
-        }
+        1 -> if (login()) println("Login Berhasil")
         2 -> totalHarga()
         3 -> gajiKaryawan()
         else -> println("Menu tidak tersedia")
@@ -35,25 +32,23 @@ fun login(): Boolean {
 
 fun validateUsername(username: String): Boolean {
     if (username.isEmpty()) exceptionHandler("Username cannot be empty")
-    else {
-        // requirement dari soal
-        if ((username.length < 6) || (username.length > 15)) exceptionHandler("Username must be at least 6 characters long and at most 15 characters long")
-        else {
-            if (!username.containsLetterAndDigit()) exceptionHandler("Username must contain letters and numbers")
-        }
-    }
+
+    // requirement dari soal
+    if ((username.length < 6) || (username.length > 15)) exceptionHandler("Username must be at least 6 characters long and at most 15 characters long")
+
+    if (!username.containsLetterAndDigit()) exceptionHandler("Username must contain letters and numbers")
+
     return true
 }
 
 fun validatePassword(password: String): Boolean {
     if (password.isEmpty()) exceptionHandler("Password cannot be empty")
-    else {
-        // requirement dari soal
-        if ((password.length < 8) || (password.length > 20)) exceptionHandler("Password must be at least 8 characters long and at most 20 characters long")
-        else {
-            if (password.onlyLetterAndDigit() || !password.containsLetterAndDigit()) exceptionHandler("Password must contain letters, numbers, and special characters")
-        }
-    }
+
+    // requirement dari soal
+    if ((password.length < 8) || (password.length > 20)) exceptionHandler("Password must be at least 8 characters long and at most 20 characters long")
+
+    if (password.onlyLetterAndDigit() || !password.containsLetterAndDigit()) exceptionHandler("Password must contain letters, numbers, and special characters")
+
     return true
 }
 
@@ -103,14 +98,12 @@ fun validateQuantityAndNominal(input: String, msg: String): Int {
     var finalInput = 0
 
     if (input.isEmpty()) exceptionHandler("$msg tidak boleh kosong")
-    else {
-        if (input.contains("-")) exceptionHandler("$msg tidak boleh negatif")
-        else {
-            finalInput = input.filter { it.isDigit() }.toInt()
 
-            if (finalInput == 0) exceptionHandler("$msg tidak boleh 0")
-        }
-    }
+    if (input.contains("-")) exceptionHandler("$msg tidak boleh negatif")
+
+    finalInput = input.filter { it.isDigit() }.toInt()
+
+    if (finalInput == 0) exceptionHandler("$msg tidak boleh 0")
 
     return finalInput
 }
@@ -141,15 +134,19 @@ fun validateDiskon(totalHarga: Int): Int {
         println("Anda mendapat diskon sebesar Rp ${potonganHarga.toInt()}")
     }
 
-    return (totalHarga - potonganHarga).toInt()
+    val totalBayar = totalHarga - potonganHarga
+
+    return totalBayar.toInt()
 }
 
 fun validatePembayaran(nominalBayar: Int, totalBayar: Int) {
+    val kembalianBayar = nominalBayar - totalBayar
+
     if (nominalBayar < totalBayar) exceptionHandler("Uang yang Anda bayarkan kurang, harap ubah nominal pembayaran")
-    else {
-        if (nominalBayar % 100000 != 0) exceptionHandler("Uang yang Anda bayarkan bukan kelipatan Rp 100.000, harap ubah nominal pembayaran")
-        else println("Uang kembalian Anda sebesar Rp ${nominalBayar - totalBayar}")
-    }
+
+    if (nominalBayar % 100000 != 0) exceptionHandler("Uang yang Anda bayarkan bukan kelipatan Rp 100.000, harap ubah nominal pembayaran")
+
+    println("Uang kembalian Anda sebesar Rp $kembalianBayar")
 }
 
 fun gajiKaryawan() {
@@ -172,12 +169,10 @@ fun validateInputGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int) 
 
     val validateGrade = "ABCD"
     if (grade.isEmpty()) exceptionHandler("Grade tidak boleh kosong")
-    else {
-        if (grade.length > 1) exceptionHandler("Grade tidak valid")
-        else {
-            if (!validateGrade.contains(grade)) exceptionHandler("Grade tidak valid")
-        }
-    }
+
+    if (grade.length > 1) exceptionHandler("Grade tidak valid")
+
+    if (!validateGrade.contains(grade)) exceptionHandler("Grade tidak valid")
 
     calculateGaji(namaKaryawan, grade, jumlahJamKerja)
 }
@@ -185,7 +180,7 @@ fun validateInputGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int) 
 fun calculateGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int){
     println("Hai, $namaKaryawan")
 
-    val gajiPerJam = when(grade){
+    val gajiPerJam = when (grade) {
         "A" -> 500000.0 / 8
         "B" -> 300000.0 / 8
         "C" -> 200000.0 / 8
@@ -193,7 +188,7 @@ fun calculateGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int){
         else -> 0.0
     }
 
-    val gajiPerJamLembur = when(grade){
+    val gajiPerJamLembur = when (grade) {
         "A" -> 50000.0
         "B" -> 30000.0
         "C" -> 20000.0
@@ -201,7 +196,7 @@ fun calculateGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int){
         else -> 0.0
     }
 
-    val potonganPerJam = when(grade){
+    val potonganPerJam = when (grade) {
         "A" -> 0.8
         "B" -> 0.6
         "C" -> 0.5
@@ -210,24 +205,22 @@ fun calculateGaji(namaKaryawan: String, grade: String, jumlahJamKerja: Int){
     }
 
     val jamKerjaPerMinggu = 40
-    val gajiTotal: Double
+    var gajiTotal = gajiPerJam * jamKerjaPerMinggu
 
     if (jumlahJamKerja > jamKerjaPerMinggu) {
         val lembur = jumlahJamKerja - jamKerjaPerMinggu
         val gajiLembur = lembur * gajiPerJamLembur
-        gajiTotal = (gajiPerJam * jamKerjaPerMinggu) + gajiLembur
+        gajiTotal += gajiLembur
 
         println("Gaji Anda minggu ini sebesar Rp ${gajiTotal.toInt()}")
         println("Anda melakukan lembur sebanyak $lembur jam")
         println("Upah lembur Anda sebesar Rp ${gajiLembur.toInt()}")
     } else if (jumlahJamKerja < jamKerjaPerMinggu) {
         val potonganGaji = (jamKerjaPerMinggu - jumlahJamKerja) * (gajiPerJam * potonganPerJam)
-        gajiTotal = (gajiPerJam * jamKerjaPerMinggu) - potonganGaji
+        gajiTotal -= potonganGaji
 
         println("Total jam kerja Anda minggu ini kurang dari 40 jam")
         println("Anda dipotong gaji sebesar Rp ${potonganGaji.toInt()}")
-    } else {
-        gajiTotal = gajiPerJam * jamKerjaPerMinggu
     }
 
     println("Total Gaji yang Anda dapatkan minggu ini sebesar Rp ${gajiTotal.toInt()}")
