@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">week2</string>
+    <string name="login">Login App</string>
+    <string name="product">Product App</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="loginBtn">Login</string>
+    <string name="username_and_password_are_required">Username and password are required</string>
+    <string name="invalid_username_or_password">Invalid username or password</string>
+    <string name="username_and_password_length">Username must be at least 6 characters and maximum 15 characters.\nPassword must be at least 8 characters and maximum 20 characters.</string>
+    <string name="username_and_password_characters">Username must contain letters and numbers.\nPassword must contain letters, numbers, and special characters</string>
+    <string name="login_success">Login berhasil</string>
+    <string name="login_success_desc">Selamat datang, %s</string>
+    <string name="login_failed">Login gagal</string>
+    <string name="user_invalid">User invalid</string>
+    <string name="product_name">Nama Produk</string>
+    <string name="product_stock">Stok Produk</string>
+    <string name="product_price">Harga Satuan</string>
+    <string name="saveBtn">Simpan</string>
+    <string name="stock_and_price_are_required">All fields are required</string>
+    <string name="stock_and_price_can_not_contain_minus">Stock and Price can not contain minus</string>
+    <string name="stock_and_price_can_not_be_zero">Stock and Price can not be zero</string>
+    <string name="stock_and_price_must_be_number">Stock and Price must be number</string>
+</resources>
