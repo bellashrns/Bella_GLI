@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">dailyTask5</string>
+    <string name="fullName">Insert your full name</string>
+    <string name="email">Insert your email</string>
+    <string name="gender">Insert your gender</string>
+    <string name="DOB">Insert your date of birth</string>
+    <string name="address">Insert your address</string>
+    <string name="degree">Insert your last degree</string>
+    <string name="submit">Submit</string>
+</resources>
