@@ -33,6 +33,8 @@ class LoginActivity : AppCompatActivity() {
 
             val intent = Intent(this, ProductActivity::class.java)
             startActivity(intent)
+
+            return
         }
 
 //      username dan password tidak valid

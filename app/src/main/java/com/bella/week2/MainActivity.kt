@@ -15,19 +15,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.loginBtn.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+        val loginBtn = binding.loginBtn
+        val productBtn = binding.productBtn
+
+        loginBtn.setOnClickListener {
+            activityIntent(LoginActivity::class.java)
         }
 
-        binding.productBtn.setOnClickListener {
-            val intent = Intent(this, ProductActivity::class.java)
-            startActivity(intent)
+        productBtn.setOnClickListener {
+            activityIntent(ProductActivity::class.java)
         }
+    }
 
-//        binding.backBtn.setOnClickListener {
-//            val intent = Intent(this, MainActivity::class.java)
-//            startActivity(intent)
-//        }
+    private fun activityIntent(activity: Class<*>) {
+        val intent = Intent(this, activity)
+        startActivity(intent)
     }
 }
